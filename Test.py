@@ -1,4 +1,4 @@
-N’aurais-tu l’impression de réussir que si tu gravis régulièrement les échelons hiérarchiques ?import streamlit as st
+import streamlit as st
 import google.generativeai as genai
 
 # Configure Gemini API with Streamlit Secrets
