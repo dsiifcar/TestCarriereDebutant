@@ -164,7 +164,7 @@ def career_anchors_page():
             prompt += f"{q}: {response}\n"
         prompt += "\nFournissez une analyse détaillée des ancres de carrière dominantes. Donnez une explication de chaque ancre en cinq lignes maximum.\n"
         prompt += "Ensuite, proposez cinq pistes de développement professionnel sous forme de liste à puces, adaptées à ces ancres.\n"
-        prompt += "Dans la description, ne pas ajouter les question ou leurs réponses, uniquement l’analyse de tests.\n"
+        prompt += "Ne mentionnez pas les numéros de questions spécifiques dans l'analyse.\n"
         prompt += "Limitez votre réponse à 200 mots."
 
 
