@@ -46,31 +46,31 @@ model = None
 
 # Schein Career Anchors Test Questions
 questions = [
-    "Rêves-tu d’être suffisamment spécialisé dans ton métier pour qu’on vienne en permanence te demander conseil ?",
+    "Aimerais-tu être tellement expert dans ton métier que tout le monde te demande des conseils ?",
     "Es-tu pleinement satisfait lorsque tu comprends comment tes collègues fonctionnent et que tu utilises bien leurs qualités ?",
-    "Rêves-tu d’un métier où tu organises ton travail comme tu l’entends et où on ne compte pas ton temps de présence au bureau ?",
+    "Rêves-tu d’un métier où tu es libre d’organiser ton travail comme tu veux, sans avoir à compter tes heures au bureau ?",
     "Préfères-tu un poste stable même si tu n’as pas autant de liberté et d’indépendance que tu le souhaiterais ?",
-    "Es-tu toujours à la recherche d’idées qui te permettraient de te mettre à ton compte ?",
+    "Rêves-tu de devenir ton propre patron mais ne sais pas encore comment ?",
     "Les métiers où tu réussis le mieux sont-ils ceux où tu as l’impression d’aider les autres ?",
     "Rêves-tu d’une activité professionnelle où on te confierait des missions impossibles ou des challenges à relever ?",
     "Sacrifierais-tu ta vie de famille pour une promotion ?",
     "Pour toi, réussir dans la vie, est-ce avoir la possibilité de progresser régulièrement pour devenir un spécialiste ?",
     "Rêves-tu d’un métier qui te permette d’avoir de l’influence sur un grand nombre de personnes ?",
-    "Aimes-tu les métiers où tu peux t’organiser comme tu l’entends sans l’aide de personne ?",
-    "Si on te propose une mutation avec des responsabilités difficiles, préfères-tu refuser pour éviter le risque d’échouer ?",
-    "Aimerais-tu mieux te mettre à ton compte qu’être salarié dans une entreprise ?",
-    "Ce que tu préfères, est-ce résoudre un problème difficile ?",
+    "Aimes-tu les métiers où tu es libre de t’organiser comme tu veux, sans dépendre de quelqu’un ?",
+    "Si on te propose une promotion avec des défis exigeants, préfères-tu la refuser par peur d’échouer ?",
+    "Préfèrerais-tu être à ton compte plutôt que travailler comme salarié ?",
+    "Ce que tu préfères, c'est résoudre un problème difficile ?",
     "L’idéal pour toi, est-ce de trouver un travail où tu puisses préserver ta vie personnelle et familiale ?",
     "Préfères-tu te spécialiser dans ton métier plutôt que de t’éloigner du terrain pour accéder à plus de responsabilités ?",
     "Plus tu es indépendant dans ton travail, plus as-tu l’impression d’être un professionnel ?",
-    "Pour toi, le plus important est-il de trouver une société sécurisante ?",
+    "Pour toi, est-ce que le plus important est de travailler dans une entreprise stable et sécurisante ?",
     "Es-tu pleinement heureux lorsque tu réussis quelque chose qui t’a demandé un gros effort ?",
     "Préfères-tu rester dans ton domaine de compétence plutôt que d’accepter un métier nouveau ?",
-    "N’aimes-tu pas les métiers trop cadrés ?",
-    "Ton seul but dans la vie est-il de créer toi-même quelque chose dont tu seras le maître d’œuvre ?",
-    "Cherches-tu un travail où tu sois en permanence en compétition avec la concurrence ?",
+    "N’aimes-tu pas les métiers trop rigides, où il y a peu de liberté ?",
+    "Ton objectif principal dans la vie est-il de créer quelque chose par toi-même, où tu es le maître d’œuvre ?",
+    "Cherches-tu un travail où tu es constamment en compétition avec d'autres ?",
     "Le plus important pour toi, est-ce ta famille et tes loisirs ? Refuses-tu les responsabilités qui te demandent une trop grande disponibilité ?",
-    "Rêves-tu de te mettre à ton compte ?"
+    "Rêves-tu de devenir ton propre patron ?"
 ]
 
 
@@ -129,7 +129,7 @@ def career_anchors_page():
     st.image(r"Logo.png")
 
     st.title("Test d'orientation des carrières")
-    st.markdown("Pour chacune des questions, donnez une note allant de 1 à 5 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.")
+    st.markdown("Pour chacune des 25 questions, donnez une note allant de 1 à 5 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.")
 
     # Initialize session state
     if 'responses' not in st.session_state:
@@ -162,9 +162,10 @@ def career_anchors_page():
         prompt = f"Analysez les réponses suivantes au test des ancres de carrière de Schein pour Moi, qui s'appelle {name} :\n\n"
         for q, response in st.session_state['responses'].items():
             prompt += f"{q}: {response}\n"
-        prompt += "\nFournissez une analyse détaillée des ancres de carrière dominantes. Donnez une explication de chaque ancre en trois lignes maximum.\n"
-        prompt += "Ensuite, proposez trois pistes de développement professionnel sous forme de liste à puces, adaptées à ces ancres."
-        prompt += "Limitez votre réponse à 100 mots."
+        prompt += "\nFournissez une analyse détaillée des ancres de carrière dominantes. Donnez une explication de chaque ancre en cinq lignes maximum.\n"
+        prompt += "Ensuite, proposez cinq pistes de développement professionnel sous forme de liste à puces, adaptées à ces ancres.\n"
+        prompt += "Dans la description, ne pas ajouter les question ou leurs réponses, uniquement l’analyse de tests.\n"
+        prompt += "Limitez votre réponse à 200 mots."
 
 
         # Send to Gemini API
