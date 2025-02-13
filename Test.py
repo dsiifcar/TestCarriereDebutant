@@ -128,7 +128,7 @@ def career_anchors_page():
     global model  # Declare that you're using the global model variable
     st.image(r"Logo.png")
 
-    st.title("Test d'orientation des carrières : Par IFCAR Solutions")
+    st.title("Test d'orientation des carrières")
     st.markdown("Pour chacune des questions, donnez une note allant de 1 à 5 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.")
 
     # Initialize session state
