@@ -129,6 +129,7 @@ def career_anchors_page():
     st.image(r"Logo.png")
 
     st.title("Test d'orientation des carrières : Par IFCAR Solutions")
+    st.markdown("Pour chacune des questions, donnez une note allant de 1 à 5 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.")
 
     # Initialize session state
     if 'responses' not in st.session_state:
@@ -145,8 +146,7 @@ def career_anchors_page():
     for i, question in enumerate(questions):
         key = f"Q{i+1}"
         st.markdown(f"### {i+1}. {question}")  # Make questions bigger
-        st.markdown("Pour chacune des questions suivantes, donnez une note allant de 1 à 6 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.")
-
+        
 
         # Implement the radio buttons for 1 to 5 scale
         st.session_state['responses'][key] = st.radio(
