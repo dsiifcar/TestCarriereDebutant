@@ -1,6 +1,3 @@
-Pour chacune des quarante questions suivantes, donnez une note allant de 1 à 6 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.
-
-
 import streamlit as st
 import google.generativeai as genai
 
