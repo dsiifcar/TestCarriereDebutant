@@ -1,3 +1,6 @@
+Pour chacune des quarante questions suivantes, donnez une note allant de 1 à 6 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.
+
+
 import streamlit as st
 import google.generativeai as genai
 
@@ -46,52 +49,33 @@ model = None
 
 # Schein Career Anchors Test Questions
 questions = [
-    "Mon rêve est d'être tellement bon(ne) dans ce que je fais que mes conseils d'expert seront recherchés en permanence.",
-    "Je suis pleinement satisfait(e) dans mon travail quand j'ai réussi à intégrer et à gérer les efforts des autres.",
-    "Je rêve d'avoir une carrière qui me donne la liberté de faire mon travail à ma façon et selon mon propre programme.",
-    "J'attache plus d'importance à la sécurité et à la stabilité qu'à la liberté et l'autonomie.",
-    "Je suis toujours à l'affût d'idées qui me permettraient de démarrer ma propre entreprise.",
-    "J'estimerai avoir réussi ma carrière seulement si j'ai le sentiment de contribuer réellement au bien-être de la société.",
-    "Je rêve d'une carrière dans laquelle je puisse résoudre ou venir à bout de situations particulièrement difficiles.",
-    "Je préférerais quitter mon entreprise plutôt que d'être placé(e) sur un poste qui compromet ma capacité à poursuivre mes intérêts personnels et familiaux.",
-    "Je rêve d'avoir une carrière internationale qui me permette de voyager et de travailler avec des personnes de diverses cultures.",
-    "J'estimerai avoir réussi ma carrière seulement si je peux développer mes capacités techniques ou fonctionnelles à un très haut niveau de compétence.",
-    "Je rêve d'être responsable d'une organisation complexe et de prendre des décisions qui touchent nombre de personnes.",
-    "Je suis pleinement satisfait(e) dans mon travail quand je suis complètement libre de définir mes propres tâches, programmes et procédures.",
-    "Je préférerais quitter définitivement mon entreprise plutôt que d'accepter une mission qui compromettrait ma sécurité dans cette entreprise.",
-    "Monter ma propre affaire est plus important pour moi que d'atteindre un haut niveau de management dans l'organisation d'autrui.",
-    "Je suis pleinement satisfait(e) dans ma carrière lorsque je peux mettre mes talents au service des autres.",
-    "J'ai le sentiment de réussir dans ma carrière seulement si je peux faire face et surmonter des défis particulièrement retors.",
-    "Je rêve d'une carrière qui me permette d'intégrer mes besoins personnels, familiaux et professionnels.",
-    "Travailler à l'étranger m'attire.",
-    "Devenir directeur de la fonction correspondant à mon domaine d'expertise m'attire plus que d'atteindre un poste de direction générale.",
-    "J'estimerai avoir réussi dans ma carrière seulement si je deviens directeur général d'une organisation.",
-    "J'estimerai avoir réussi dans ma carrière seulement si j'atteins une autonomie et une liberté totale.",
-    "Je recherche des emplois dans des organisations qui me procureront un sentiment de sécurité et de stabilité.",
-    "Je suis pleinement satisfait(e) dans mon travail quand j'ai pu construire quelque chose qui est entièrement le fruit de mes idées et efforts.",
-    "Utiliser mes compétences pour que le monde devienne un endroit plus agréable pour vivre et travailler est plus important pour moi que d'atteindre une position managériale élevée.",
-    "J'ai été pleinement satisfait(e) dans ma carrière quand j'ai résolu des problèmes apparemment insolubles ou quand je suis venu(e) à bout de situations apparemment impossibles.",
-    "J'estimerai avoir réussi dans la vie seulement si j'ai pu trouver un équilibre entre mes besoins personnels, ceux liés à ma famille et ma carrière.",
-    "J'estimerai avoir réussi dans ma carrière seulement si je parviens à travailler dans un environnement international.",
-    "Je préférerais quitter mon entreprise plutôt que d'accepter une mission qui me ferait sortir de mon champ d'expertise.",
-    "Atteindre un poste de direction générale m'attire plus que de devenir directeur de la fonction correspondant à mon domaine d'expertise.",
-    "L'opportunité de faire mon travail à ma façon, libre de règles et de contraintes, est plus importante pour moi que la sécurité.",
-    "Je suis pleinement satisfait(e) dans mon travail quand j'éprouve le sentiment d'une sécurité totale sur le plan financier et sur celui de l'emploi.",
-    "J'estimerai avoir réussi ma carrière seulement si j'arrive à créer ou à élaborer quelque chose qui est ma propre idée ou mon propre produit.",
-    "Je rêve d'avoir une carrière qui apporte une réelle contribution à l'humanité et à la société.",
-    "Je recherche des opportunités de travail qui défient fortement mes capacités à résoudre des problèmes et/ou mon goût de la compétition.",
-    "Équilibrer les exigences de la vie personnelle et professionnelle est plus important pour moi que d'atteindre une position managériale élevée.",
-    "Je préférerais quitter mon entreprise plutôt que d'accepter une mission qui m'impliquerait pas la possibilité d'une mobilité internationale.",
-    "Je suis pleinement satisfait(e) de mon travail quand j'ai été capable d'utiliser les compétences et talents rattachés à ma spécialisation.",
-    "Je préférerais quitter mon entreprise plutôt que d'accepter un travail qui m'empêcherait d'atteindre une position de management général.",
-    "Je préférerais quitter mon entreprise plutôt que d'accepter un travail qui réduirait mon autonomie et ma liberté.",
-    "Je rêve d'avoir une carrière qui me permette d'éprouver un sentiment de sécurité et de stabilité.",
-    "Je rêve de démarrer et de développer ma propre affaire.",
-    "Je préférerais quitter définitivement mon entreprise plutôt que d'accepter une mission qui amoindrirait mes capacités d'être au service des autres.",
-    "Travailler sur des problèmes quasiment insolubles est plus important pour moi que d'atteindre une position managériale élevée.",
-    "J'ai toujours cherché des opportunités de travail qui minimisent les interférences avec les préoccupations personnelles ou familiales.",
-    "Je rêve d'avoir une carrière qui me permette d'avoir des responsabilités internationales."
+    "Rêves-tu d’être suffisamment spécialisé dans ton métier pour qu’on vienne en permanence te demander conseil ?",
+    "Es-tu pleinement satisfait lorsque tu comprends comment tes collègues fonctionnent et que tu utilises bien leurs qualités ?",
+    "Rêves-tu d’un métier où tu organises ton travail comme tu l’entends et où on ne compte pas ton temps de présence au bureau ?",
+    "Préfères-tu un poste stable même si tu n’as pas autant de liberté et d’indépendance que tu le souhaiterais ?",
+    "Es-tu toujours à la recherche d’idées qui te permettraient de te mettre à ton compte ?",
+    "Les métiers où tu réussis le mieux sont-ils ceux où tu as l’impression d’aider les autres ?",
+    "Rêves-tu d’une activité professionnelle où on te confierait des missions impossibles ou des challenges à relever ?",
+    "Sacrifierais-tu ta vie de famille pour une promotion ?",
+    "Pour toi, réussir dans la vie, est-ce avoir la possibilité de progresser régulièrement pour devenir un spécialiste ?",
+    "Rêves-tu d’un métier qui te permette d’avoir de l’influence sur un grand nombre de personnes ?",
+    "Aimes-tu les métiers où tu peux t’organiser comme tu l’entends sans l’aide de personne ?",
+    "Si on te propose une mutation avec des responsabilités difficiles, préfères-tu refuser pour éviter le risque d’échouer ?",
+    "Aimerais-tu mieux te mettre à ton compte qu’être salarié dans une entreprise ?",
+    "Ce que tu préfères, est-ce résoudre un problème difficile ?",
+    "L’idéal pour toi, est-ce de trouver un travail où tu puisses préserver ta vie personnelle et familiale ?",
+    "Préfères-tu te spécialiser dans ton métier plutôt que de t’éloigner du terrain pour accéder à plus de responsabilités ?",
+    "Plus tu es indépendant dans ton travail, plus as-tu l’impression d’être un professionnel ?",
+    "Pour toi, le plus important est-il de trouver une société sécurisante ?",
+    "Es-tu pleinement heureux lorsque tu réussis quelque chose qui t’a demandé un gros effort ?",
+    "Préfères-tu rester dans ton domaine de compétence plutôt que d’accepter un métier nouveau ?",
+    "N’aimes-tu pas les métiers trop cadrés ?",
+    "Ton seul but dans la vie est-il de créer toi-même quelque chose dont tu seras le maître d’œuvre ?",
+    "Cherches-tu un travail où tu sois en permanence en compétition avec la concurrence ?",
+    "Le plus important pour toi, est-ce ta famille et tes loisirs ? Refuses-tu les responsabilités qui te demandent une trop grande disponibilité ?",
+    "Rêves-tu de te mettre à ton compte ?"
 ]
+
 
 # New page content
 def new_page():
@@ -164,6 +148,8 @@ def career_anchors_page():
     for i, question in enumerate(questions):
         key = f"Q{i+1}"
         st.markdown(f"### {i+1}. {question}")  # Make questions bigger
+        st.markdown("Pour chacune des questions suivantes, donnez une note allant de 1 à 6 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.")
+
 
         # Implement the radio buttons for 1 to 5 scale
         st.session_state['responses'][key] = st.radio(
@@ -176,10 +162,13 @@ def career_anchors_page():
 
     if st.button("Soumettre les réponses"):
         # Prepare the prompt for Gemini
-        prompt = f"Analysez les réponses suivantes au test des ancres de carrière de Schein pour Moi, ca mon nom : {name} :\n\n"
+        prompt = f"Analysez les réponses suivantes au test des ancres de carrière de Schein pour Moi, qui s'appelle {name} :\n\n"
         for q, response in st.session_state['responses'].items():
             prompt += f"{q}: {response}\n"
-        prompt += "\nFournissez une analyse détaillée des ancres de carrière dominantes et des suggestions pour leur développement professionnel. Limitez votre réponse à 500 mots."
+        prompt += "\nFournissez une analyse détaillée des ancres de carrière dominantes. Donnez une explication de chaque ancre en trois lignes maximum.\n"
+        prompt += "Ensuite, proposez trois pistes de développement professionnel sous forme de liste à puces, adaptées à ces ancres."
+        prompt += "Limitez votre réponse à 100 mots."
+
 
         # Send to Gemini API
         try:
