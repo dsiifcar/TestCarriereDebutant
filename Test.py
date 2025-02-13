@@ -1,4 +1,4 @@
-import streamlit as st
+N’aurais-tu l’impression de réussir que si tu gravis régulièrement les échelons hiérarchiques ?import streamlit as st
 import google.generativeai as genai
 
 # Configure Gemini API with Streamlit Secrets
@@ -66,7 +66,7 @@ questions = [
     "Cherches-tu un travail où tu es constamment en compétition avec d'autres ?",
     "Préfèrerais-tu être à ton compte plutôt que travailler comme salarié ?",
     "Es-tu prêt à sacrifier une partie de ta liberté pour un emploi stable et sécurisé ?",
-    "N’aurais-tu l’impression de réussir que si tu gravis régulièrement les échelons hiérarchiques ?",
+    "Est-ce que tu aurais l’impression de réussir uniquement si tu montes régulièrement dans la hiérarchie ?",
     "Préfères-tu garder ton indépendance dans ton travail, même si cela signifie progresser moins vite dans l’entreprise ?",
     "Rêves-tu d’un métier qui te permette de contribuer réellement à améliorer le monde et l’entreprise ?",
     "Es-tu prêt à sacrifier une promotion pour préserver ton équilibre entre vie professionnelle et vie personnelle ?"
@@ -128,7 +128,7 @@ def career_anchors_page():
     st.image(r"Logo.png")
 
     st.title("Test d'orientation des carrières")
-    st.markdown("Pour chacune des 25 questions, donnez une note allant de 1 à 5 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.")
+    st.markdown("Pour chacune des 24 questions, donnez une note allant de 1 à 5 par rapport à ce qui vous semble être vrai pour vous. Plus le chiffre sera élevé, plus la phrase correspondra à ce que vous ressentez.")
 
     # Initialize session state
     if 'responses' not in st.session_state:
