@@ -163,12 +163,13 @@ def career_anchors_page():
         for q, response in st.session_state['responses'].items():
             prompt += f"{q}: {response}\n"
 
-        prompt += "\nIdentifiez les ancres de carrière dominantes pour {name} et estimez le pourcentage d'importance de chaque ancre dans le profil de {name}.\n"
+        prompt += "\nIdentifiez les top trois ancres de carrière dominantes pour {name} et estimez le pourcentage d'importance de chaque ancre dans le profil de {name}.\n"
         prompt += "Présentez les résultats sous forme de liste, où chaque élément indique l'ancre et son pourcentage d'importance (par exemple: Autonomie: 60%).\n"
         prompt += "Ne mentionnez pas les numéros de questions spécifiques dans votre analyse.\n"
-        prompt += "Après la liste des pourcentages, fournissez pour l'ancre dominante une explication en deux lignes maximum.\n"
+        prompt += "Après la liste des pourcentages, fournissez pour les trois ancre dominante une explication en deux lignes maximum.\n"
         prompt += "Ensuite, proposez trois pistes de développement professionnel sous forme de liste à puces, adaptées à ces ancres."
         prompt += "Limitez votre réponse à 200 mots."
+
 
 
         # Send to Gemini API
