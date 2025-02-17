@@ -1,79 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
 
-# --- THEME CUSTOMIZATION ---
-st.set_page_config(
-    page_title="IFCAR Solutions",
-    page_icon=":briefcase:",  # A relevant emoji
-)
-
-# Custom CSS for a light green theme
-st.markdown(
-    """
-    <style>
-    body {
-        background-color: #f0f8ff;  /* Light green-blue */
-        color: #333333;  /* Dark gray text */
-    }
-
-    .stApp {
-        background-color: #f0f8ff;
-    }
-
-    .stButton>button {
-        color: #fff;
-        background-color: #4CAF50; /* Green button */
-        border: none;
-        padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-
-    .stTextInput>label, .stNumberInput>label, .stSelectbox>label, .stRadio>label, .stTextArea>label {
-        color: #006400;  /* Darker green labels */
-    }
-
-    h1, h2, h3, h4, h5, h6 {
-        color: #008000;  /* Forest green headings */
-    }
-
-    .css-1adrfps {
-        background-color: #e0fae0; /* light green radio buttons*/
-    }
-
-    [data-baseweb="radio"] {
-        color: #006400 !important; /*Dark green font for radio buttons */
-    }
-
-    .streamlit-expanderHeader {
-        font-weight: bold;
-        color: #008000;  /* Forest green expander headers */
-    }
-
-    .streamlit-expanderContent {
-        background-color: #f5fff5; /* Very light green for expander content */
-        border-radius: 5px;
-        padding: 10px;
-    }
-
-    a {
-        color: #008B8B; /* Dark Cyan links */
-    }
-
-    .css-keje6w {
-        border-color: #008000;
-        background-color: #f0f8ff;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Configure Gemini API with Streamlit Secrets
 # This assumes you have the API keys stored in Streamlit secrets
 # For example, in your Streamlit app's settings (Secrets section), you'd have:
@@ -86,13 +13,19 @@ st.markdown(
 
 
 # List of 5 API keys
-api_keys = [
-    st.secrets["api_keys"]["key1"],
-    st.secrets["api_keys"]["key2"],
-    st.secrets["api_keys"]["key3"],
-    st.secrets["api_keys"]["key4"],
-    st.secrets["api_keys"]["key5"],
-]
+api_keys = []
+try:
+    api_keys = [
+        st.secrets["api_keys"]["key1"],
+        st.secrets["api_keys"]["key2"],
+        st.secrets["api_keys"]["key3"],
+        st.secrets["api_keys"]["key4"],
+        st.secrets["api_keys"]["key5"],
+    ]
+except KeyError as e:
+    st.error(f"Missing API key in Streamlit secrets: {e}.  Please ensure you have defined 'api_keys' and keys 1-5 in your Streamlit secrets.")
+    api_keys = []  # Ensure api_keys is still defined even if secrets are missing
+
 
 # Track the last used API key index
 api_key_index = 0
@@ -100,6 +33,7 @@ api_key_index = 0
 # Function to set API key and configure the model in order
 def configure_api_key():
     global api_key_index
+    global model  # Declare you are updating the global model
     while api_key_index < len(api_keys):
         try:
             key = api_keys[api_key_index]  # Select the current API key
@@ -111,11 +45,15 @@ def configure_api_key():
             api_key_index += 1  # Move to the next API key
             continue
     # If all keys fail, show a message and return None
-    st.error("Sorry, the service is temporarily unavailable. Please try again later.")
+    st.error("Sorry, the service is temporarily unavailable. Please try again later.  Consider checking your API key validity and usage limits.")
     return None  # If all keys fail
 
 # Initialize the model using the first working API key
 model = None
+# Attempt initial model configuration
+if api_keys: # Only configure if api_keys has content
+    model = configure_api_key()
+
 
 # Schein Career Anchors Test Questions
 questions = [
@@ -126,7 +64,7 @@ questions = [
     "Les métiers où tu réussis le mieux sont-ils ceux où tu as l’impression d’aider les autres ?",
     "Ce que tu préfères, c'est résoudre un problème difficile ?",
     "L’idéal pour toi, est-ce de trouver un travail où tu puisses préserver ta vie personnelle et familiale ?",
-    "Pour toi, réussir dans la vie, est-ce avoir la possibilité de progresser régulièrement pour devenir un spécialiste ?",
+    "Pour toi, est-ce que le plus important est de travailler dans une entreprise stable et sécurisante ?",
     "Préfères-tu les responsabilités de management à celles de spécialiste ?",
     "Rêves-tu d’un métier où tu es libre d’organiser ton travail comme tu veux, sans avoir à compter tes heures au bureau ?",
     "Pour toi, est-ce que le plus important est de travailler dans une entreprise stable et sécurisante ?",
@@ -205,7 +143,8 @@ def career_anchors_page():
 
     # Initialize session state
     if 'responses' not in st.session_state:
-        st.session_state['responses'] = {}
+        st.session_state['responses'] = {f"Q{i+1}": 0 for i in range(len(questions))} # Initialize all scores to 0
+
 
     # Collect user information
     name = st.text_input("Nom et Prénom *")
@@ -214,51 +153,68 @@ def career_anchors_page():
         st.warning("Veuillez remplir le champ du nom.")
         return
 
+     # Map radio button labels to numerical scores
+    SCORE_MAPPING = {
+        'Pas du tout vrai': 1,
+        'Pas vraiment': 2,
+        'Neutre': 3,
+        'En partie vrai': 4,
+        'Tout à fait vrai': 5
+    }
+
+
     # Collect responses
     for i, question in enumerate(questions):
         key = f"Q{i+1}"
         st.markdown(f"### {i+1}. {question}")  # Make questions bigger
-        
 
         # Implement the radio buttons for 1 to 5 scale
-        st.session_state['responses'][key] = st.radio(
+        selected_label = st.radio(
             "Sélectionnez votre réponse:",
-            options=['Pas du tout vrai', 'Pas vraiment', 'Neutre', 'En partie vrai', 'Tout à fait vrai'],
-            index=None,  # Default to the middle (3)
-            horizontal=True,  # Ensures all options appear on the same line
+            options=list(SCORE_MAPPING.keys()),
+            index=None,  # Default to no selection
+            horizontal=True,
             key=key
         )
+        # Store the numerical value instead of the label
+        st.session_state['responses'][key] = SCORE_MAPPING.get(selected_label, 0)  # Default to 0 if not selected
 
     if st.button("Soumettre les réponses"):
-        # Prepare the prompt for Gemini
-        prompt = f"Analysez les réponses suivantes au test des ancres de carrière de Schein pour Moi, qui s'appelle {name} :\n\n"
-        for q, response in st.session_state['responses'].items():
-            prompt += f"{q}: {response}\n"
+        # Check for unanswered questions
+        unanswered = [q for q, score in st.session_state['responses'].items() if score == 0]
 
-        prompt += "\nIdentifiez les top trois ancres de carrière dominantes pour {name} et estimez le pourcentage d'importance de chaque ancre dans le profil de {name}.\n"
-        prompt += "Présentez les résultats sous forme de liste, où chaque élément indique l'ancre et son pourcentage d'importance (par exemple: Autonomie: 60%).\n"
-        prompt += "Ne mentionnez pas les numéros de questions spécifiques dans votre analyse.\n"
-        prompt += "Après la liste des pourcentages, fournissez pour l'ancre dominante une explication en trois lignes maximum.\n"
-        prompt += "Ensuite, proposez trois pistes de développement professionnel sous forme de liste à puces, adaptées à ces ancres."
-        prompt += "Limitez votre réponse à 500 mots."
-
+        if unanswered:
+            st.error("Veuillez répondre à toutes les questions avant de soumettre.")
+        else:
+            # Prepare the prompt for Gemini
+            prompt = f"Analysez les réponses de {name} au test des ancres de carrière:\n\n"
+            for i, (question, score) in enumerate(zip(questions, st.session_state['responses'].values())):
+                prompt += f"{question}: {score}/5\n"
 
 
-        # Send to Gemini API
-        try:
-            # Configure the model if it's not already configured (or has failed)
-            if model is None:
-                model = configure_api_key()
+            prompt += "\nIdentifiez les top trois ancres de carrière dominantes pour {name} et estimez le pourcentage d'importance de chaque ancre dans le profil de {name}.\n"
+            prompt += "Présentez les résultats sous forme de liste, où chaque élément indique l'ancre et son pourcentage d'importance (par exemple: Autonomie: 60%).\n"
+            prompt += "Ne mentionnez pas les numéros de questions spécifiques dans votre analyse.\n"
+            prompt += "Après la liste des pourcentages, fournissez pour l'ancre dominante une explication en trois lignes maximum.\n"
+            prompt += "Ensuite, proposez trois pistes de développement professionnel sous forme de liste à puces, adaptées à ces ancres."
+            prompt += "Limitez votre réponse à 500 mots."
 
-            if model is not None:  # only proceed if the model is configured
-                response = model.generate_content(prompt)
-                st.subheader("Résultats de l'analyse")
-                st.write(response.text)
-            else:
-                st.error("Failed to configure the Gemini API after trying all available keys. Please check your secrets or try again later.")
-        except Exception as e:
-            st.error(f"Une erreur s'est produite lors de l'analyse: {e}")
-            model = None  # Reset the model if there's an error, so it tries to reconfigure next time
+
+            # Send to Gemini API
+            try:
+                # Configure the model if it's not already configured (or has failed)
+                if model is None:
+                    model = configure_api_key()
+
+                if model is not None:  # only proceed if the model is configured
+                    response = model.generate_content(prompt)
+                    st.subheader("Résultats de l'analyse")
+                    st.write(response.text)
+                else:
+                    st.error("Failed to configure the Gemini API after trying all available keys. Please check your secrets or try again later.")
+            except Exception as e:
+                st.error(f"Une erreur s'est produite lors de l'analyse: {e}")
+                model = None  # Reset the model if there's an error, so it tries to reconfigure next time
 
         st.markdown("---")  # Add a separator
         st.markdown("##### Ressources Utiles:")
