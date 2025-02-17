@@ -13,13 +13,19 @@ import google.generativeai as genai
 
 
 # List of 5 API keys
-api_keys = [
-    st.secrets["api_keys"]["key1"],
-    st.secrets["api_keys"]["key2"],
-    st.secrets["api_keys"]["key3"],
-    st.secrets["api_keys"]["key4"],
-    st.secrets["api_keys"]["key5"],
-]
+api_keys = []
+try:
+    api_keys = [
+        st.secrets["api_keys"]["key1"],
+        st.secrets["api_keys"]["key2"],
+        st.secrets["api_keys"]["key3"],
+        st.secrets["api_keys"]["key4"],
+        st.secrets["api_keys"]["key5"],
+    ]
+except KeyError as e:
+    st.error(f"Missing API key in Streamlit secrets: {e}.  Please ensure you have defined 'api_keys' and keys 1-5 in your Streamlit secrets.")
+    api_keys = []  # Ensure api_keys is still defined even if secrets are missing
+
 
 # Track the last used API key index
 api_key_index = 0
@@ -27,6 +33,7 @@ api_key_index = 0
 # Function to set API key and configure the model in order
 def configure_api_key():
     global api_key_index
+    global model  # Declare you are updating the global model
     while api_key_index < len(api_keys):
         try:
             key = api_keys[api_key_index]  # Select the current API key
@@ -38,11 +45,15 @@ def configure_api_key():
             api_key_index += 1  # Move to the next API key
             continue
     # If all keys fail, show a message and return None
-    st.error("Sorry, the service is temporarily unavailable. Please try again later.")
+    st.error("Sorry, the service is temporarily unavailable. Please try again later.  Consider checking your API key validity and usage limits.")
     return None  # If all keys fail
 
 # Initialize the model using the first working API key
 model = None
+# Attempt initial model configuration
+if api_keys: # Only configure if api_keys has content
+    model = configure_api_key()
+
 
 # Schein Career Anchors Test Questions
 questions = [
@@ -151,6 +162,7 @@ def career_anchors_page():
         'Tout à fait vrai': 5
     }
 
+
     # Collect responses
     for i, question in enumerate(questions):
         key = f"Q{i+1}"
@@ -175,9 +187,10 @@ def career_anchors_page():
             st.error("Veuillez répondre à toutes les questions avant de soumettre.")
         else:
             # Prepare the prompt for Gemini
-            prompt = f"Analysez les réponses suivantes (sur une échelle de 1 à 5) au test des ancres de carrière de Schein pour {name} :\n\n"
-            for q, score in st.session_state['responses'].items():
-                prompt += f"{q}: {score}/5\n"  # e.g., "Q1: 5/5"
+            prompt = f"Analysez les réponses de {name} au test des ancres de carrière:\n\n"
+            for i, (question, score) in enumerate(zip(questions, st.session_state['responses'].values())):
+                prompt += f"{question}: {score}/5\n"
+
 
             prompt += "\nIdentifiez les top trois ancres de carrière dominantes pour {name} et estimez le pourcentage d'importance de chaque ancre dans le profil de {name}.\n"
             prompt += "Présentez les résultats sous forme de liste, où chaque élément indique l'ancre et son pourcentage d'importance (par exemple: Autonomie: 60%).\n"
