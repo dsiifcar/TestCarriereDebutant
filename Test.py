@@ -53,7 +53,7 @@ questions = [
     "Les métiers où tu réussis le mieux sont-ils ceux où tu as l’impression d’aider les autres ?",
     "Ce que tu préfères, c'est résoudre un problème difficile ?",
     "L’idéal pour toi, est-ce de trouver un travail où tu puisses préserver ta vie personnelle et familiale ?",
-    "Pour toi, réussir dans la vie, est-ce avoir la possibilité de progresser régulièrement pour devenir un spécialiste ?",
+    "Pour toi, est-ce que le plus important est de travailler dans une entreprise stable et sécurisante ?",
     "Préfères-tu les responsabilités de management à celles de spécialiste ?",
     "Rêves-tu d’un métier où tu es libre d’organiser ton travail comme tu veux, sans avoir à compter tes heures au bureau ?",
     "Pour toi, est-ce que le plus important est de travailler dans une entreprise stable et sécurisante ?",
@@ -132,7 +132,8 @@ def career_anchors_page():
 
     # Initialize session state
     if 'responses' not in st.session_state:
-        st.session_state['responses'] = {}
+        st.session_state['responses'] = {f"Q{i+1}": 0 for i in range(len(questions))} # Initialize all scores to 0
+
 
     # Collect user information
     name = st.text_input("Nom et Prénom *")
@@ -141,51 +142,66 @@ def career_anchors_page():
         st.warning("Veuillez remplir le champ du nom.")
         return
 
+     # Map radio button labels to numerical scores
+    SCORE_MAPPING = {
+        'Pas du tout vrai': 1,
+        'Pas vraiment': 2,
+        'Neutre': 3,
+        'En partie vrai': 4,
+        'Tout à fait vrai': 5
+    }
+
     # Collect responses
     for i, question in enumerate(questions):
         key = f"Q{i+1}"
         st.markdown(f"### {i+1}. {question}")  # Make questions bigger
-        
 
         # Implement the radio buttons for 1 to 5 scale
-        st.session_state['responses'][key] = st.radio(
+        selected_label = st.radio(
             "Sélectionnez votre réponse:",
-            options=['Pas du tout vrai', 'Pas vraiment', 'Neutre', 'En partie vrai', 'Tout à fait vrai'],
-            index=None,  # Default to the middle (3)
-            horizontal=True,  # Ensures all options appear on the same line
+            options=list(SCORE_MAPPING.keys()),
+            index=None,  # Default to no selection
+            horizontal=True,
             key=key
         )
+        # Store the numerical value instead of the label
+        st.session_state['responses'][key] = SCORE_MAPPING.get(selected_label, 0)  # Default to 0 if not selected
 
     if st.button("Soumettre les réponses"):
-        # Prepare the prompt for Gemini
-        prompt = f"Analysez les réponses suivantes au test des ancres de carrière de Schein pour Moi, qui s'appelle {name} :\n\n"
-        for q, response in st.session_state['responses'].items():
-            prompt += f"{q}: {response}\n"
+        # Check for unanswered questions
+        unanswered = [q for q, score in st.session_state['responses'].items() if score == 0]
 
-        prompt += "\nIdentifiez les top trois ancres de carrière dominantes pour {name} et estimez le pourcentage d'importance de chaque ancre dans le profil de {name}.\n"
-        prompt += "Présentez les résultats sous forme de liste, où chaque élément indique l'ancre et son pourcentage d'importance (par exemple: Autonomie: 60%).\n"
-        prompt += "Ne mentionnez pas les numéros de questions spécifiques dans votre analyse.\n"
-        prompt += "Après la liste des pourcentages, fournissez pour l'ancre dominante une explication en trois lignes maximum.\n"
-        prompt += "Ensuite, proposez trois pistes de développement professionnel sous forme de liste à puces, adaptées à ces ancres."
-        prompt += "Limitez votre réponse à 500 mots."
+        if unanswered:
+            st.error("Veuillez répondre à toutes les questions avant de soumettre.")
+        else:
+            # Prepare the prompt for Gemini
+            prompt = f"Analysez les réponses suivantes (sur une échelle de 1 à 5) au test des ancres de carrière de Schein pour {name} :\n\n"
+            for q, score in st.session_state['responses'].items():
+                prompt += f"{q}: {score}/5\n"  # e.g., "Q1: 5/5"
+
+            prompt += "\nIdentifiez les top trois ancres de carrière dominantes pour {name} et estimez le pourcentage d'importance de chaque ancre dans le profil de {name}.\n"
+            prompt += "Présentez les résultats sous forme de liste, où chaque élément indique l'ancre et son pourcentage d'importance (par exemple: Autonomie: 60%).\n"
+            prompt += "Ne mentionnez pas les numéros de questions spécifiques dans votre analyse.\n"
+            prompt += "Après la liste des pourcentages, fournissez pour l'ancre dominante une explication en trois lignes maximum.\n"
+            prompt += "Ensuite, proposez trois pistes de développement professionnel sous forme de liste à puces, adaptées à ces ancres."
+            prompt += "Limitez votre réponse à 500 mots."
 
 
+            # Send to Gemini API
+            try:
+                # Configure the model if it's not already configured (or has failed)
+                if model is None:
+                    model = configure_api_key()
 
-        # Send to Gemini API
-        try:
-            # Configure the model if it's not already configured (or has failed)
-            if model is None:
-                model = configure_api_key()
-
-            if model is not None:  # only proceed if the model is configured
-                response = model.generate_content(prompt)
-                st.subheader("Résultats de l'analyse")
-                st.write(response.text)
-            else:
-                st.error("Failed to configure the Gemini API after trying all available keys. Please check your secrets or try again later.")
-        except Exception as e:
-            st.error(f"Une erreur s'est produite lors de l'analyse: {e}")
-            model = None  # Reset the model if there's an error, so it tries to reconfigure next time
+                if model is not None:  # only proceed if the model is configured
+                    response = model.generate_content(prompt)
+                    st.subheader("Résultats de l'analyse")
+                    st.write(response.text)
+                else:
+                    st.error("Failed to configure the Gemini API after trying all available keys. Please check your secrets or try again later.")
+            except Exception as e:
+                st.error(f"Une erreur s'est produite lors de l'analyse: {e}")
+                model = None  # Reset the model if there's an error, so it tries to reconfigure next time
 
         st.markdown("---")  # Add a separator
         st.markdown("##### Ressources Utiles:")
